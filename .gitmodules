@@ -1,3 +1,6 @@
 [submodule "giropops-senhas_balbertus"]
 	path = giropops-senhas_balbertus
 	url = git@github.com:badtuxx/giropops-senhas.git
+[submodule "giropops-senhas"]
+	path = giropops-senhas
+	url = git@github.com:badtuxx/giropops-senhas.git
