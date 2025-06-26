@@ -1,0 +1,164 @@
+"List volumes created"
+#docker volume ls 
+
+"Create a new volume type=volume"
+#docker volume create myfirstvolume
+
+#docker volume ls
+balbertus@balbertus-virtual-machine:/BuildDocker_local/docker_uncomplicated/volume$ docker volume ls
+DRIVER    VOLUME NAME
+local     1e775e345ba837f22c350c8dab35819c28e21cc42c7aa717a7b5c2b54ccdfad2
+local     7ff1ec4525427c234b3b11585c5edc002dfd05dfcd1eeda774016aa4b9f4a774
+local     62ca70c043d6cdc192b0525760137217b69029b9e417aac0915d4b61414d37ab
+local     b28f92b9673dc3df939271f475d31e9f1615ea1c664bd841b056fd1ff5220abb
+local     b59ac03c90070b530eb2f127b1e11838a22f83ffa7275f044e6e5717638fd682
+local     myfirstvolume
+
+#docker volume inspect myfirstvolume
+balbertus@balbertus-virtual-machine:/BuildDocker_local/docker_uncomplicated/volume$ docker inspect volume myfirstvolume
+[
+    {
+        "CreatedAt": "2025-06-26T11:28:44-03:00",
+        "Driver": "local",
+        "Labels": null,
+        "Mountpoint": "/home/balbertus/.local/share/docker/volumes/myfirstvolume/_data",
+        "Name": "myfirstvolume",
+        "Options": null,
+        "Scope": "local"
+    }
+]
+Error: No such object: volume
+
+###################################
+Search the local mount point
+root@balbertus-virtual-machine:/var/lib/docker/volumes# cd /home/balbertus/.local/share/docker/volumes/
+root@balbertus-virtual-machine:/home/balbertus/.local/share/docker/volumes# ls -la
+total 64
+drwx-----x  8 balbertus balbertus  4096 Jun 26 11:28 .
+drwx--x--- 13 balbertus balbertus  4096 Jun 26 11:11 ..
+drwx-----x  3 balbertus balbertus  4096 Jun 23 09:51 1e775e345ba837f22c350c8dab35819c28e21cc42c7aa717a7b5c2b54ccdfad2
+drwx-----x  3 balbertus balbertus  4096 Jun 17 10:25 62ca70c043d6cdc192b0525760137217b69029b9e417aac0915d4b61414d37ab
+drwx-----x  3 balbertus balbertus  4096 Jun 23 14:20 7ff1ec4525427c234b3b11585c5edc002dfd05dfcd1eeda774016aa4b9f4a774
+drwx-----x  3 balbertus balbertus  4096 Jun 17 10:08 b28f92b9673dc3df939271f475d31e9f1615ea1c664bd841b056fd1ff5220abb
+drwx-----x  3 balbertus balbertus  4096 Jun 23 09:58 b59ac03c90070b530eb2f127b1e11838a22f83ffa7275f044e6e5717638fd682
+-rw-------  1 balbertus balbertus 65536 Jun 26 11:28 metadata.db
+drwx-----x  3 balbertus balbertus  4096 Jun 26 11:28 myfirstvolume
+root@balbertus-virtual-machine:/home/balbertus/.local/share/docker/volumes#
+
+###############################
+Testing Persistency
+MY LOCAL MACHINE
+root@balbertus-virtual-machine:~# cd /home/balbertus/.local/share/docker/volumes/
+root@balbertus-virtual-machine:/home/balbertus/.local/share/docker/volumes# cd myfirstvolume/
+root@balbertus-virtual-machine:/home/balbertus/.local/share/docker/volumes/myfirstvolume# ls -la
+total 12
+drwx-----x 3 balbertus balbertus 4096 Jun 26 11:28 .
+drwx-----x 8 balbertus balbertus 4096 Jun 26 11:28 ..
+drwxr-xr-x 2 balbertus balbertus 4096 Jun 26 11:28 _data
+root@balbertus-virtual-machine:/home/balbertus/.local/share/docker/volumes/myfirstvolume# cd _data/
+root@balbertus-virtual-machine:/home/balbertus/.local/share/docker/volumes/myfirstvolume/_data# ls -la
+total 8
+drwxr-xr-x 2 balbertus balbertus 4096 Jun 26 11:28 .
+drwx-----x 3 balbertus balbertus 4096 Jun 26 11:28 ..
+root@balbertus-virtual-machine:/home/balbertus/.local/share/docker/volumes/myfirstvolume/_data# touch "testing persistent volume"
+root@balbertus-virtual-machine:/home/balbertus/.local/share/docker/volumes/myfirstvolume/_data# ls -la
+total 8
+drwxr-xr-x 2 balbertus balbertus 4096 Jun 26 11:34  .
+drwx-----x 3 balbertus balbertus 4096 Jun 26 11:28  ..
+-rw-r--r-- 1 root      root         0 Jun 26 11:34 'testing persistent volume'
+root@balbertus-virtual-machine:/home/balbertus/.local/share/docker/volumes/myfirstvolume/_data# 
+
+CONTAINER
+albertus@balbertus-virtual-machine:/BuildDocker_local/docker_uncomplicated/volume$ docker container run -ti --name testing-per-vol --mount type=volume,src=myfirstvolume,dst=/myfirstvolume ubuntu
+root@fa3c4a2b7612:/# ls -la
+total 60
+drwxr-xr-x   1 root   root    4096 Jun 26 14:42 .
+drwxr-xr-x   1 root   root    4096 Jun 26 14:42 ..
+-rwxr-xr-x   1 root   root       0 Jun 26 14:42 .dockerenv
+lrwxrwxrwx   1 root   root       7 Apr 22  2024 bin -> usr/bin
+drwxr-xr-x   2 root   root    4096 Apr 22  2024 boot
+drwxr-xr-x   5 root   root     360 Jun 26 14:42 dev
+drwxr-xr-x   1 root   root    4096 Jun 26 14:42 etc
+drwxr-xr-x   3 root   root    4096 May 29 02:23 home
+lrwxrwxrwx   1 root   root       7 Apr 22  2024 lib -> usr/lib
+lrwxrwxrwx   1 root   root       9 Apr 22  2024 lib64 -> usr/lib64
+drwxr-xr-x   2 root   root    4096 May 29 02:14 media
+drwxr-xr-x   2 root   root    4096 May 29 02:14 mnt
+drwxr-xr-x   2 root   root    4096 Jun 26 14:34 myfirstvolume
+drwxr-xr-x   2 root   root    4096 May 29 02:14 opt
+dr-xr-xr-x 355 nobody nogroup    0 Jun 26 14:42 proc
+drwx------   2 root   root    4096 May 29 02:22 root
+drwxr-xr-x   4 root   root    4096 May 29 02:23 run
+lrwxrwxrwx   1 root   root       8 Apr 22  2024 sbin -> usr/sbin
+drwxr-xr-x   2 root   root    4096 May 29 02:14 srv
+dr-xr-xr-x  13 nobody nogroup    0 Jun 26 14:19 sys
+drwxrwxrwt   2 root   root    4096 May 29 02:22 tmp
+drwxr-xr-x  12 root   root    4096 May 29 02:14 usr
+drwxr-xr-x  11 root   root    4096 May 29 02:22 var
+root@fa3c4a2b7612:/# cd myfirstvolume/
+root@fa3c4a2b7612:/myfirstvolume# ls -la
+total 8
+drwxr-xr-x 2 root   root    4096 Jun 26 14:34  .
+drwxr-xr-x 1 root   root    4096 Jun 26 14:42  ..
+-rw-r--r-- 1 nobody nogroup    0 Jun 26 14:34 'testing persistent volume'
+root@fa3c4a2b7612:/myfirstvolume#
+
+####################################
+Sharing the same volume between Containers
+
+balbertus@balbertus-virtual-machine:/BuildDocker_local/docker_uncomplicated/volume$ sudo su -
+root@balbertus-virtual-machine:~# cd /home/balbertus/.local/share/docker/volumes/
+1e775e345ba837f22c350c8dab35819c28e21cc42c7aa717a7b5c2b54ccdfad2/ b28f92b9673dc3df939271f475d31e9f1615ea1c664bd841b056fd1ff5220abb/
+62ca70c043d6cdc192b0525760137217b69029b9e417aac0915d4b61414d37ab/ b59ac03c90070b530eb2f127b1e11838a22f83ffa7275f044e6e5717638fd682/
+7ff1ec4525427c234b3b11585c5edc002dfd05dfcd1eeda774016aa4b9f4a774/ myfirstvolume/
+root@balbertus-virtual-machine:~# cd /home/balbertus/.local/share/docker/volumes/myfirstvolume/_data/
+root@balbertus-virtual-machine:/home/balbertus/.local/share/docker/volumes/myfirstvolume/_data# ls -la
+total 8
+drwxr-xr-x 2 balbertus balbertus 4096 Jun 26 11:34  .
+drwx-----x 3 balbertus balbertus 4096 Jun 26 11:28  ..
+-rw-r--r-- 1 root      root         0 Jun 26 11:34 'testing persistent volume'
+root@balbertus-virtual-machine:/home/balbertus/.local/share/docker/volumes/myfirstvolume/_data# vim index.html
+root@balbertus-virtual-machine:/home/balbertus/.local/share/docker/volumes/myfirstvolume/_data# cat index.html 
+MY FIRST SHARED VOLUME BETEWEEN CONTAINERS
+root@balbertus-virtual-machine:/home/balbertus/.local/share/docker/volumes/myfirstvolume/_data#
+
+
+#docker run -d --name web_1 --mount type=volume,src=myfirstvolume,target=/usr/share/nginx/html nginx
+
+#docker exec -ti web_1 bash
+
+#curl localhost
+
+
+albertus@balbertus-virtual-machine:/BuildDocker_local/docker_uncomplicated/volume$ docker run -d --name web_1 --mount type=volume,src=myfirstvolume,target=/usr/share/nginx/html nginx
+Unable to find image 'nginx:latest' locally
+latest: Pulling from library/nginx
+dad67da3f26b: Already exists 
+4eb3a9835b30: Pull complete 
+021db26e13de: Pull complete 
+397cc88dcd41: Pull complete 
+5f4a88bd8474: Pull complete 
+66467f827546: Pull complete 
+f05e87039331: Pull complete 
+Digest: sha256:dc53c8f25a10f9109190ed5b59bda2d707a3bde0e45857ce9e1efaa32ff9cbc1
+Status: Downloaded newer image for nginx:latest
+059b13fe21f124167a7862c7d19ae2345d6424e9a2a1ab12e6bc8239d610bdbb
+balbertus@balbertus-virtual-machine:/BuildDocker_local/docker_uncomplicated/volume$ docker exec -ti web_1 bash
+root@059b13fe21f1:/# curl localhost
+MY FIRST SHARED VOLUME BETEWEEN CONTAINERS
+root@059b13fe21f1:/# 
+
+########################################################
+Option without --mount
+
+#docker run -d --name web_2 -v myfisrtvolume:/usr/share/nginx/html nginx
+
+balbertus@balbertus-virtual-machine:/BuildDocker_local/docker_uncomplicated/volume$ docker run -d --name web_3 -v myfirstvolume:/usr/share/nginx/html nginx
+ad98d7199903c2e35688f143f615bf42aa4c77be90ccbd345dc263a66e392c47
+balbertus@balbertus-virtual-machine:/BuildDocker_local/docker_uncomplicated/volume$ docker exec -ti web_3 bash
+root@ad98d7199903:/# curl locahost
+curl: (6) Could not resolve host: locahost
+root@ad98d7199903:/# curl localhost
+MY FIRST SHARED VOLUME BETEWEEN CONTAINERS
+root@ad98d7199903:/# 
+
