@@ -1,0 +1,32 @@
+services:
+  giropops-senhas:
+    build: ./Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - giropops
+    environment:
+      REDIS_HOST: redis
+    volumes:
+      - strigus:/strigus
+    depends_on:
+      - redis
+    deploy:
+      resources:
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+        limits:
+          cpus: '0.5'
+          memory: 256M
+  redis:
+    image: redis
+    networks:
+      - giropops
+
+networks:
+  giropops:
+    driver: bridge
+
+volumes:
+  strigus:

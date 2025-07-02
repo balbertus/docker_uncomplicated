@@ -1,0 +1,22 @@
+"Managing CPU and Memory"
+      --cpu-period int                   Limit CPU CFS (Completely Fair Scheduler) period
+      --cpu-quota int                    Limit CPU CFS (Completely Fair Scheduler) quota
+      --cpu-rt-period int                Limit CPU real-time period in microseconds
+      --cpu-rt-runtime int               Limit CPU real-time runtime in microseconds
+  -c, --cpu-shares int                   CPU shares (relative weight)
+      --cpus decimal                     Number of CPUs
+      --cpuset-cpus string               CPUs in which to allow execution (0-3, 0,1)
+      --cpuset-mems string               MEMs in which to allow execution (0-3, 0,1)
+
+#docker run -d --name mycontainer --cpus 2 ubuntu
+
+To see limitation in nano cpus
+#docker inspect 
+
+  -m, --memory bytes                     Memory limit
+      --memory-reservation bytes         Memory soft limit
+      --memory-swap bytes                Swap limit equal to memory plus swap: '-1' to enable unlimited swap
+      --memory-swappiness int            Tune container memory swappiness (0 to 100) (default -1)
+
+#docker run -d --name mycontainer --memory 64m ubuntu
+

@@ -1,0 +1,18 @@
+services:
+  giropops-senhas:
+    build: ./Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - giropops
+    environment:
+      REDIS_HOST: redis
+
+  redis:
+    image: redis
+    networks:
+      - giropops
+
+networks:
+  giropops:
+    driver: bridge

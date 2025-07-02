@@ -1,0 +1,9 @@
+#docker network ls
+#docker network create
+Connect a Network to container
+#docker network connect
+bridge  host    none
+#
+#--network network                  Connect a container to a network
+#--network-alias list               Add network-scoped alias for the container
+

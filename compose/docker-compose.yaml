@@ -1,0 +1,74 @@
+services:
+  giropops-senhas:
+    build: 
+      context: ./Dockerfiles
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - giropops
+    environment:
+      REDIS_HOST: redis
+    env_file:
+      - .env
+    volumes:
+      - type: volume
+        source: strigus
+        target: /strigus
+    depends_on:
+      - redis
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      resources:
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+        limits:
+          cpus: '0.5'
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    dns:
+     - 8.8.8.8
+     - 8.8.4.4
+    labels:
+      com.docker.description: "Giropops_Senhas"
+      com.docker.version: "1.0"
+
+  redis:
+    image: redis
+    command: redis-server --appendonly yes
+    networks:
+      - giropops
+    volumes:
+      - strigus:/strigus
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]  
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+                
+networks:
+  giropops:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.20.0.0/16"
+    labels:
+      io.balbertus.network: "giropops_network"
+volumes:
+  strigus:
+    driver: local
+    driver_opts:
+      type: "none"
+      device: /BuildDocker_local/docker_uncomplicated/compose
+      o: "bind"
+    labels:
+      io.balbertus.volume: "strigus_volume"
